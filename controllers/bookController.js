@@ -144,7 +144,7 @@ exports.book_create_post = [
         // Extract the validation errors from a request.
         const errors = validationResult(req);
         
-        // Create abook object with escaped and trimmed data.
+        // Create a Book object with escaped and trimmed data.
         const book = new Book({
             title: req.body.title,
             author: req.body.author,
@@ -211,7 +211,7 @@ exports.book_delete_post = (req, res) => {
 
 // Display Book update form on GET.
 exports.book_update_get = (req, res, next) => {
-    // get the book, authors and genresfor the form.
+    // get the book, authors and genres for the form.
     async.parallel(
         {
             book(callback) {
