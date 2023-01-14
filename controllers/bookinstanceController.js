@@ -109,13 +109,37 @@ exports.bookinstance_create_post = [
 ]
 
 // Display BookInstance delete form on GET.
-exports.bookinstance_delete_get = (req, res) => {
-    res.send("NOT IMPLEMENTED: BookInstance delete GET");
+exports.bookinstance_delete_get = (req, res, next) => {
+    // get the book instance
+    BookInstance.findById(req.params.id).populate("book").exec(function (err, bookinstance) {
+        if (err) {
+            return next(err);
+        }
+        if (bookinstance == null) {
+            // No results.
+            res.redirect("/catalog/authors");
+        }
+        // Successful, so render.
+        console.log("BookInstance: ", bookinstance);
+        res.render("bookinstance_delete", {
+            title: "Delete Book Copy",
+            bookinstance: bookinstance,
+        });
+    });
 }
 
 // Handle BookInstance delete on POST.
-exports.bookinstance_delete_post = (req, res) => {
-    res.send("NOT IMPLEMENTED: BookInstance delete POST");
+exports.bookinstance_delete_post = (req, res, next) => {
+    // Assume the fields bookinstance id is valid.
+    BookInstance.findByIdAndRemove(req.params.id,
+        (err) => {
+        if (err) {
+            return next(err);
+        }
+        // successful, redirect back to the detail page.
+        res.redirect("/catalog/bookinstances");
+        }
+    );
 }
 
 // Display BookInstance update form on GET.
@@ -132,16 +156,18 @@ exports.bookinstance_update_get = function (req, res, next) {
             },
         },
         
+        // check for any error in getting the instance or the book
         function (err, results) {
             if (err) {
                 return next(err);
             }
             
+            // check to be sure there is an book instance in the results
             if (results.bookinstance == null) {
-            // no results
-            var err = new Error("Book copy not found");
-            err.status = 404;
-            return next(err);
+                // no results
+                var err = new Error("Book copy not found");
+                err.status = 404;
+                return next(err);
             }
             // Successful, so render
             res.render("bookinstance_form", {
