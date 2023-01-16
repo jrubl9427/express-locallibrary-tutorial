@@ -104,13 +104,71 @@ exports.genre_create_post = [
 
 
 // Display Genre delete form on GET.
-exports.genre_delete_get = (req, res) => {
-    res.send("NOT IMPLEMENTED: Genre delete GET");
+exports.genre_delete_get = (req, res, next) => {
+    // get the genre to delete and any books inb this genre
+    async.parallel(
+        {
+            genre: function (callback) {
+            Genre.findById(req.params.id).exec(callback);
+            },
+            genre_books: function (callback) {
+                Book.find({ genre: req.params.id }).exec(callback);
+            },
+        },
+        function (err, results) {
+            if (err) {
+                return next(err);
+            }
+            if (results.genre == null) {
+                // No results.
+                res.redirect("/catalog/genres")
+            }
+            // Successful, so render.
+            res.render("genre_delete", {
+                title: "Delete Genre",
+                genre: results.genre,
+                genre_books: results.genre_books,
+            });
+        }
+    );
 }
 
 // Handle Genre delete on POST.
-exports.genre_delete_post = (req, res) => {
-    res.send("NOT IMPLEMENTED: Genre delete POST");
+exports.genre_delete_post = (req, res, next) => {
+    async.parallel(
+        {
+            genre: function (callback) {
+                Genre.findById(req.params.id).exec(callback);
+            },
+            genre_books: function (callback) {
+                Book.find({ genre: req.params.id }).exec(callback);
+            },
+        },
+        function (err, results) {
+            if (err) {
+                return next(err);
+            }
+            // Success
+            if (results.genre_books.length > 0) {
+                // Genre has books. Render as for GET route.
+                res.render("genre_delete", {
+                    title: "Delete Genre",
+                    genre: results.genre,
+                    genre_books: results.genre_books,
+                });
+                return;
+            } else {
+                // Genre has no books. Delete object and redirect to the list of genres.
+                Genre.findByIdAndRemove(req.body.id, (err) => {
+                        if (err) {
+                            return next(err);
+                        }
+                        // Success - go to genres list
+                        res.redirect("/catalog/genres");
+                    });
+            }
+        }
+    );
 }
 
 // Display Genre update form on GET.
@@ -127,7 +185,7 @@ exports.genre_update_get = (req, res, next) => {
 
 // Handle Genre update on POST.
 exports.genre_update_post = [
-    // Validate and sanitize t he name field.
+    // Validate and sanitize the name field.
     body("name", "Genre name required").trim().isLength({ min: 3}).escape(),
     
     // Process request after validation and sanitation.
@@ -159,7 +217,7 @@ exports.genre_update_post = [
                     if (err) {
                         return next(err);
                     }
-                    // Successfull - redirec to detail page
+                    // Successfull - redirect to detail page
                     res.redirect(thegenre.url);
                 }
             ); 
