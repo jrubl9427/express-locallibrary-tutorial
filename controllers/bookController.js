@@ -26,7 +26,6 @@ exports.index = function (req, res) {
             },
         },
         ( err, results) => {
-            console.log("Index error: ", err);
             res.render("index", {
                 title: "Local Library Home",
                 error: err,
