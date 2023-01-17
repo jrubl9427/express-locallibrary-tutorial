@@ -104,12 +104,12 @@ exports.genre_create_post = [
 
 
 // Display Genre delete form on GET.
-exports.genre_delete_get = (req, res, next) => {
+exports.genre_delete_get = function (req, res, next) {
     // get the genre to delete and any books inb this genre
     async.parallel(
         {
             genre: function (callback) {
-            Genre.findById(req.params.id).exec(callback);
+                Genre.findById(req.params.id).exec(callback);
             },
             genre_books: function (callback) {
                 Book.find({ genre: req.params.id }).exec(callback);
@@ -121,7 +121,7 @@ exports.genre_delete_get = (req, res, next) => {
             }
             if (results.genre == null) {
                 // No results.
-                res.redirect("/catalog/genres")
+                res.redirect("/catalog/genres");
             }
             // Successful, so render.
             res.render("genre_delete", {
