@@ -1,4 +1,4 @@
-dateextend layout
+extends layout
 
 block content
     h1= title
@@ -34,7 +34,7 @@ block content
                 type='date'
                 name='due_back'
                 value=(undefined===bookinstance ? '' : bookinstance.due_back)
-                ) 
+                )
                         
         div.form-group
             label(for='status') Status:
