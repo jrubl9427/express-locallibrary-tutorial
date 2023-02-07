@@ -39,7 +39,8 @@ block content
                 placeholder='Summary'
                 name='summary'
                 required='true'
-                ) #{undefined===book ? '' : book.summary}
+                value=(undefined===book ? '' : book.summary)
+                )
                         
         div.form-group
             label(for='isbn') ISBN:
